@@ -69,9 +69,10 @@ if ( $p->opts->passwordfile ) {
 }
 
 my $restic_output = qx($restic_cmd);
+my $exitcode      = $? >> 8;
 
-unless ($restic_output) {
-    $p->plugin_exit( UNKNOWN, "Could not run " . $restic_cmd );
+unless ( $exitcode eq 0 ) {
+    $p->plugin_exit( UNKNOWN, "Failed to run '" . $restic_cmd . "'" );
 }
 
 my $restic_json;
