@@ -7,6 +7,7 @@ import json
 import datetime
 import dateutil.parser
 import nagiosplugin
+import os
 
 _log = logging.getLogger('nagiosplugin')
 
@@ -22,6 +23,18 @@ class Restic(nagiosplugin.Resource):
         self.sudo = sudo
 
     def probe(self):
+        """
+        Run restic and parse its output
+
+        :return:
+        """
+
+        # For some reason, check.main() is the only place where exceptions are printed nicely
+        if not self.repo and not os.environ.get('RESTIC_REPOSITORY'):
+            raise nagiosplugin.CheckError('Please specify repository location (-r, --repo or $RESTIC_REPOSITORY)')
+        if not self.password_file and not (os.environ.get('RESTIC_PASSWORD') or os.environ.get('RESTIC_PASSWORDFILE')):
+            raise nagiosplugin.CheckError('Please specify password or its location (-p, --password-file, $RESTIC_PASSWORD or $RESTIC_PASSWORDFILE)')
+
         cmd = []
 
         if self.sudo:
