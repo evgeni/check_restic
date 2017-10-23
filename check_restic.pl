@@ -11,6 +11,7 @@ use Try::Tiny;
 
 my $p = Monitoring::Plugin->new(
     usage => "Usage: %s "
+      . "[ --sudo ] "
       . "[ -w|--warning=<hours> ] "
       . "[ -c|--critical=<hours> ] "
       . "[ -H|--host=<hostname>] "
@@ -18,10 +19,15 @@ my $p = Monitoring::Plugin->new(
       . "[ -r|--repo=<repo>] "
       . "[ -p|--passwordfile=<file> ] ",
     url     => 'https://github.com/evgeni/check_restic',
-    version => '1.0',
+    version => '1.1',
     license => 'This plugin is free software, and comes with ABSOLUTELY
 NO WARRANTY. It may be used, redistributed and/or modified under
 the terms of the MIT/Expat license.',
+);
+
+$p->add_arg(
+    spec => 'sudo',
+    help => 'Use sudo when invoking restic',
 );
 
 $p->add_arg(
@@ -61,6 +67,7 @@ $p->getopts;
 
 my $restic_cmd = 'restic snapshots --json --no-lock';
 
+if ( $p->opts->sudo ) { $restic_cmd = 'sudo ' . $restic_cmd; }
 if ( $p->opts->host ) { $restic_cmd .= ' --host ' . $p->opts->host; }
 if ( $p->opts->path ) { $restic_cmd .= ' --path ' . $p->opts->path; }
 if ( $p->opts->repo ) { $restic_cmd .= ' --repo ' . $p->opts->repo; }
