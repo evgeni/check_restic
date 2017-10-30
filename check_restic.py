@@ -43,12 +43,10 @@ class Restic(nagiosplugin.Resource):
                 'Please specify password or its location (-p, --password-file,'
                 ' $RESTIC_PASSWORD or $RESTIC_PASSWORD_FILE)')
 
-        cmd = []
+        cmd = [self.restic_bin, '--json', '--no-lock', 'snapshots']
 
         if self.sudo:
             cmd = ['sudo'] + cmd
-
-        cmd.extend([self.restic_bin, '--json', '--no-lock', 'snapshots'])
 
         if self.host:
             cmd.extend(['--host', self.host])
@@ -124,7 +122,7 @@ class ResticSummary(nagiosplugin.Summary):
         if results.results[0].state == nagiosplugin.Unknown:
             return results.results[0].hint
 
-        ret = ['%s is %2f hours old' % (r.metric.name, r.metric.value)
+        ret = ['%s is %.2f hours old' % (r.metric.name, r.metric.value)
                for r in results if r.state != nagiosplugin.Ok]
         return 'Snapshot %s' % ', '.join(ret)
 
