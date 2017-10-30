@@ -38,10 +38,10 @@ class Restic(nagiosplugin.Resource):
                 '$RESTIC_REPOSITORY)')
         if not self.password_file and \
            not (os.environ.get('RESTIC_PASSWORD') or
-                os.environ.get('RESTIC_PASSWORDFILE')):
+                os.environ.get('RESTIC_PASSWORD_FILE')):
             raise nagiosplugin.CheckError(
                 'Please specify password or its location (-p, --password-file,'
-                ' $RESTIC_PASSWORD or $RESTIC_PASSWORDFILE)')
+                ' $RESTIC_PASSWORD or $RESTIC_PASSWORD_FILE)')
 
         cmd = []
 
@@ -67,7 +67,7 @@ class Restic(nagiosplugin.Resource):
         except subprocess.CalledProcessError as e:
             raise nagiosplugin.CheckError('Failed to run %s: %s' % (
                 ' '.join(cmd), e.output.decode()))
-        except FileNotFoundError as e:
+        except IOError as e:
             raise nagiosplugin.CheckError('Failed to run %s: %s' % (
                 ' '.join(cmd), e))
         _log.debug('Got output: %s' % restic_result)
