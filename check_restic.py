@@ -158,6 +158,9 @@ def main():
              '$RESTIC_PASSWORD_FILE)')
     argp.add_argument('-v', '--verbose', action='count', default=0,
                       help='increase output verbosity (use up to 3 times)')
+    argp.add_argument(
+        '-t', '--timeout', metavar='SECONDS', type=int, default=10,
+        help='Plugin timeout in seconds (default: %(default)s)')
     args = argp.parse_args()
 
     check = nagiosplugin.Check(
@@ -169,7 +172,7 @@ def main():
         ResticSummary(),
         )
 
-    check.main(verbose=args.verbose)
+    check.main(verbose=args.verbose, timeout=args.timeout)
 
 
 if __name__ == '__main__':
