@@ -138,10 +138,10 @@ def main():
         help='Path to the restic binary, or the name of restic in $PATH '
              '(default: %(default)s)')
     argp.add_argument(
-        '-w', '--warning', metavar='HOURS', type=int, default=24,
+        '-w', '--warning', metavar='HOURS', type=int, default=25,
         help='Snapshots older than HOURS are WARNING (default: %(default)s)')
     argp.add_argument(
-        '-c', '--critical', metavar='HOURS', type=int, default=48,
+        '-c', '--critical', metavar='HOURS', type=int, default=49,
         help='Snapshots older than HOURS are CRITICAL (default: %(default)s)')
     argp.add_argument('-H', '--host', metavar='HOST',
                       help='only consider snapshots for this host')
