@@ -65,7 +65,7 @@ $p->add_arg(
 
 $p->getopts;
 
-my $restic_cmd = 'restic snapshots --json --no-lock';
+my $restic_cmd = 'restic snapshots --json --no-lock --latest 1';
 
 if ( $p->opts->sudo ) { $restic_cmd = 'sudo ' . $restic_cmd; }
 if ( $p->opts->host ) { $restic_cmd .= ' --host ' . $p->opts->host; }
@@ -90,29 +90,28 @@ catch {
     $p->plugin_exit( UNKNOWN, "Could not find snapshots" );
 };
 
-my $last_snapshot = 0;
+my $oldest_snapshot;
 
 foreach my $snapshot (@$restic_json) {
     my $ts = str2time( $snapshot->{'time'} );
-    if ( $ts > $last_snapshot ) { $last_snapshot = $ts }
+    my $msg = $snapshot->{'hostname'}.':'.$snapshot->{'paths'}[0];
+    my $delta = ( time() - $ts );
+
+    if ( $delta > ( $p->opts->critical * 60 * 60 ) ) {
+        $p->add_message( CRITICAL, $msg);
+    }
+    elsif ( $delta > ( $p->opts->warning * 60 * 60 ) ) {
+        $p->add_message( WARNING, $msg);
+    }
+    $oldest_snapshot = $ts if !$oldest_snapshot or $oldest_snapshot > $ts;
 }
 
-my $msg =
-  "last snapshot: " . strftime( '%Y-%m-%dT%H:%M:%SZ', gmtime($last_snapshot) );
+my ( $code, $message ) = $p->check_messages( join_all => 1);
 
-my $delta = ( time() - $last_snapshot );
-if ( $delta > ( $p->opts->critical * 60 * 60 ) ) {
-    $p->add_message( CRITICAL, $msg );
+if( $code) {
+    $message = 'backups out of date: '.$message;
+} else {
+    $message = 'backups within '.int( (time() - $oldest_snapshot)/60/60).' hours';
 }
-elsif ( $delta > ( $p->opts->warning * 60 * 60 ) ) {
-    $p->add_message( WARNING, $msg );
-}
-else {
-    $p->add_message( OK, $msg );
-}
-
-my $code;
-my $message;
-( $code, $message ) = $p->check_messages;
 
 $p->nagios_exit( $code, $message );
