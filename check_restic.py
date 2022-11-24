@@ -43,7 +43,7 @@ class Restic(nagiosplugin.Resource):
                 'Please specify password or its location (-p, --password-file,'
                 ' $RESTIC_PASSWORD or $RESTIC_PASSWORD_FILE)')
 
-        cmd = [self.restic_bin, 'snapshots', '--json', '--no-lock']
+        cmd = [self.restic_bin, 'snapshots', '--json', '--no-lock', '--insecure-tls']
 
         if self.sudo:
             cmd = ['sudo'] + cmd
