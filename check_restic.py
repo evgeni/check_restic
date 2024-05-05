@@ -43,7 +43,7 @@ class Restic(nagiosplugin.Resource):
                 'Please specify password or its location (-p, --password-file,'
                 ' $RESTIC_PASSWORD or $RESTIC_PASSWORD_FILE)')
 
-        cmd = [self.restic_bin, 'snapshots', '--json', '--no-lock']
+        cmd = [self.restic_bin, 'snapshots', '--json', '--no-lock', '--latest', '1']
 
         if self.sudo:
             cmd = ['sudo'] + cmd
@@ -79,9 +79,7 @@ class Restic(nagiosplugin.Resource):
 
         if not snapshots:
             raise nagiosplugin.CheckError('Could not find snapshots')
-        snapshots.sort(
-            key=lambda snapshot: dateutil.parser.parse(snapshot['time']),
-            reverse=True)
+
         last_snapshots = {}
 
         while True:
