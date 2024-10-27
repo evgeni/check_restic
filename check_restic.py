@@ -91,8 +91,8 @@ class Restic(nagiosplugin.Resource):
                 break
 
         for path, snapshot in last_snapshots.items():
-            snapshot_age = datetime.datetime.now(None) - \
-                dateutil.parser.parse(snapshot['time']).replace(tzinfo=None)
+            snapshot_age = datetime.datetime.now(datetime.UTC) - \
+                dateutil.parser.parse(snapshot['time'])
             snapshot_age = snapshot_age.total_seconds() / (60*60)
             yield nagiosplugin.Metric(path, snapshot_age, uom='h',
                                       context='last_snapshot_age')
